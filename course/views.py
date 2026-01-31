@@ -57,3 +57,18 @@ def delete_course(request, id):
             {'error': 'Course does not exist'},
             status=status.HTTP_404_NOT_FOUND
         )
+
+@api_view(['PUT'])
+def update_course(request, id):
+    try:
+        course = Course.objects.get(id=id)
+        serializer = CourseSerializer(course, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except Course.DoesNotExist:
+        return Response(
+            {'error': 'Course does not exist'},
+            status=status.HTTP_404_NOT_FOUND
+        )
