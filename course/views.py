@@ -1,5 +1,5 @@
 from django.core.serializers import serialize
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -33,6 +33,27 @@ def create_course(request):
 
 @api_view(['GET'])
 def get_course_by_id(request, id):
-    course = Course.objects.get(id=id)
-    serializer = CourseSerializer(course)
-    return Response(serializer.data)
+    try:
+        course = Course.objects.get(id=id)
+        serializer = CourseSerializer(course)
+        return Response(serializer.data)
+    except Course.DoesNotExist:
+        return Response(
+            {'error': 'Course does not exist'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+@api_view(['DELETE'])
+def delete_course(request, id):
+    try:
+        course = Course.objects.get(id=id)
+        course.delete()
+        return Response(
+            {'success': 'Delete thành công'},
+            status=status.HTTP_200_OK
+        )
+    except Course.DoesNotExist:
+        return Response(
+            {'error': 'Course does not exist'},
+            status=status.HTTP_404_NOT_FOUND
+        )
